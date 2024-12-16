@@ -1,1 +1,5 @@
-CREATE TABLE example_table (id SERIAL PRIMARY KEY, name TEXT);
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'To Do'
+);
