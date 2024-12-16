@@ -1,12 +1,59 @@
 <!DOCTYPE html>
-<html>
-        <head>
-        <title>Kanban Board</title>
-                <script
-                        src='https://code.jquery.com/jquery-3.6.0.min.js'>
-                </script>
-        </head>
-        <body>
-                 <h1>Kanban Board</h1> 
-        </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .board {
+            display: flex;
+        }
+        .column {
+            margin-right: 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Super Duper Kanban Board</h1>
+
+    <div class="board">
+        <div class="column" id="todo">
+            <h3>To Do</h3>
+        </div>
+        <div class="column" id="in-progress">
+            <h3>In Progress</h3>
+        </div>
+        <div class="column" id="done">
+            <h3>Done</h3>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: 'http://backend:8080/api/health',
+                method: 'GET',
+                success: function (response) {
+                    console.log('Backend response:', response);
+                },
+                error: function (error) {
+                    console.error('Failed to connect to backend', error);
+                }
+            });
+        });
+    </script>
+
+</body>
 </html>
