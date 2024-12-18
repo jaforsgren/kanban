@@ -3,12 +3,34 @@ body {
     margin: 20px;
 }
 
-.task-card {
+.task-card p {
+        font-size: 0.875em; /* 14px/16=0.875em */
+}
+
+.create-task-card {
     border: 1px solid #ddd;
     padding: 10px;
     margin-bottom: 10px;
-    background-color: #e7e7e7;
+    background-color: #f4f2f2;
 }
+
+#section-1{
+    border-top: 5px solid #FFB300;
+  }
+
+  #section-2{
+    border-top: 5px solid #001eff;
+  }
+
+  #section-3{
+    border-top: 5px solid #09ff00;
+  }
+
+  .create-board-link {
+    border: 1px solid #ddd;
+    background-color: #f4f2f2;
+  }
+
 
 /* Hide the modal initially */
 .modal {
@@ -36,7 +58,7 @@ body {
   
   /* Close button */
   .close {
-    color: #aaa;
+    color: #d0d0d0;
     float: right;
     font-size: 28px;
     font-weight: bold;

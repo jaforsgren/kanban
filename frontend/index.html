@@ -1,48 +1,87 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban Board</title>
+    <br><br>
+    <title>Kanban</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Modal -->
-<div id="createTaskModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Create New Task</h2>
-      <form id="createTaskForm">
-        <label for="taskTitle">Title:</label>
-        <input type="text" id="taskTitle" name="title" required>
-        
-        <label for="taskDescription">Description:</label>
-        <textarea id="taskDescription" name="description" required></textarea>
-        
-        <label for="taskStatus">Status:</label>
-        <select id="taskStatus" name="status" required>
-          <option value="To Do">To Do</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
-        </select>
-        
-        <button type="submit", class="create-task-btn">Create Task</button>
-      </form>
+
+    <nav>
+		<a href="/" class="brand">
+			<span>Kanban</span></a>
+		<input id="bmenu" type="checkbox" class="show">
+		<label for="bmenu" class="burger toggle pseudo button">menu</label>
+		<div class="menu">
+			<a href="/" class="pseudo button icon-help-circled">Test</a>
+			<a href="https://github.com/franciscop/picnic" target="_blank" class="pseudo button icon-g">GitHub</a>
+			<a href="/documentation" class="button icon-file-code">Documentation</a>
+
+		</div>
+	</nav>
+
+    
+    <div id="board-page" style="display:none;">
+        <h1 id="board-title"></h1>
+        <div id="tasks-list" class="flex four"></div>
     </div>
+
+
+<div class="flex three center">
+    <div><span></span></div>
+    
+    <div id="all-boards-page" class="full half-1000 third-1000">   
+        <h1>All Boards</h1> 
+        <div class="flex three"id="boards-list" ></div>
+    </div>
+
+    <div><span></span></div>
   </div>
 
-    <h1>Kanban Board4444</h1>
 
-    <div id="task-list"></div>
+    <div id="createTaskModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Create New Task</h2>
+          <form id="createTaskForm">
+            <label for="taskTitle">Title:</label>
+            <input type="text" id="taskTitle" name="title" required>
+            
+            <label for="taskDescription">Description:</label>
+            <textarea id="taskDescription" name="description" required></textarea>
+            
+            <label for="taskStatus">Status:</label>
+            <select id="taskStatus" name="status" required>
+              <option value="To Do">To Do</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+            
+            <button type="submit", class="create-task-btn">Create Task</button>
+          </form>
+        </div>
+      </div>
+
+
+      <div id="createBoardModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Create New Board</h2>
+          <form id="createBoardForm">
+            <label for="boardTitle">Title:</label>
+            <input type="text" id="boardTitle" name="title" required>
+            <button type="submit", class="create-board-btn">Create Task</button>
+          </form>
+        </div>
+      </div>
 
     <script src="app.js"></script>
 </body>
-
-
-
-  
-
-
 </html>
