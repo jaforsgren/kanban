@@ -5,55 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban Board</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .board {
-            display: flex;
-        }
-        .column {
-            margin-right: 20px;
-        }
-        .card {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-    <h1>Super Duper Kanban Board</h1>
-
-    <div class="board">
-        <div class="column" id="todo">
-            <h3>To Do</h3>
-        </div>
-        <div class="column" id="in-progress">
-            <h3>In Progress</h3>
-        </div>
-        <div class="column" id="done">
-            <h3>Done</h3>
-        </div>
+    <!-- Modal -->
+<div id="createTaskModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Create New Task</h2>
+      <form id="createTaskForm">
+        <label for="taskTitle">Title:</label>
+        <input type="text" id="taskTitle" name="title" required>
+        
+        <label for="taskDescription">Description:</label>
+        <textarea id="taskDescription" name="description" required></textarea>
+        
+        <label for="taskStatus">Status:</label>
+        <select id="taskStatus" name="status" required>
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+        
+        <button type="submit", class="create-task-btn">Create Task</button>
+      </form>
     </div>
+  </div>
 
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                url: 'http://backend:8080/api/health',
-                method: 'GET',
-                success: function (response) {
-                    console.log('Backend response:', response);
-                },
-                error: function (error) {
-                    console.error('Failed to connect to backend', error);
-                }
-            });
-        });
-    </script>
+    <h1>Kanban Board4444</h1>
 
+    <div id="task-list"></div>
+
+    <script src="app.js"></script>
 </body>
+
+
+
+  
+
+
 </html>

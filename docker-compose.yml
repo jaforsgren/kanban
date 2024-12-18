@@ -13,6 +13,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/migrations:/migrations
   backend:
     build:
       context: ./backend
@@ -27,6 +28,8 @@ services:
     build:
       context: ./frontend
     container_name: kanban_frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
     ports:
       - "9081:80"
     depends_on:

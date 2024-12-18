@@ -1,5 +1,6 @@
 CREATE TABLE tasks (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'To Do'
+    status TEXT NOT NULL DEFAULT 'To Do',
+    description TEXT DEFAULT ''
 );

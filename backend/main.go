@@ -9,17 +9,26 @@ import (
     "time"
 	"encoding/json"
 	"errors"
-
+	"strconv"
+	"github.com/gorilla/mux"
     _ "github.com/jackc/pgx/v5/stdlib" // magic psql driver
 )
 
 
 // represents a task on the Kanban board
 type Task struct {
-    ID     int    `json:"id"`
+    ID     *int    `json:"id"`
     Title  string `json:"title"`
     Status string `json:"status"`
+	Description string `json:"description"`
 }
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	}
+
 
 func main() {
     // Connect
@@ -37,22 +46,25 @@ func main() {
     }
 
     log.Println("Connected to the database!")
-
-    mux := http.NewServeMux()
+	r := mux.NewRouter() // gorilla Mux Router
 
 	// ROUTES
+	r.Methods(http.MethodOptions).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		w.WriteHeader(http.StatusNoContent)
+	})
 
-    mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+    r.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
         w.WriteHeader(http.StatusOK)
         fmt.Fprintln(w, "Go api is running!")
     })
 
 	  // Fetch all tasks
-	mux.HandleFunc("/api/tasks/list", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Listing tasks...")
-	
+	r.HandleFunc("/api/tasks/list", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()  // Ensure context is canceled after the function completes
+		defer cancel() 
 	
 		rows, err := db.QueryContext(ctx, "SELECT id, title, status FROM tasks")
 		if err != nil {
@@ -61,7 +73,7 @@ func main() {
 				http.Error(w, "Request timed out", http.StatusRequestTimeout)
 				return
 			}
-			fmt.Println("read error...", err)
+			fmt.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -79,23 +91,41 @@ func main() {
 	
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(tasks)
-	})
+	}).Methods("GET", "OPTIONS")
 
-    // Create a new task
-    mux.HandleFunc("/api/tasks/create", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()  // Ensure context is canceled after the function completes
-	
-			var task Task
-			if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+    // Create / Update task
+    r.HandleFunc("/api/tasks/create", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		// createTaskHandler(§db, &w, &r)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel() 
+
+		var task Task
+		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if task.ID != nil {
+			// Updating task
+			fmt.Println("Updating task:", *task.ID)
+			query := `UPDATE tasks SET title = $1, description = $2, status = $3 WHERE id = $4`
+			_, err := db.ExecContext(ctx, query, task.Title, task.Description, task.Status, *task.ID)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					fmt.Println("task update timeout:", err)
+					http.Error(w, "Request timed out", http.StatusRequestTimeout)
+					return
+				}
+				fmt.Println("task update error:", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-	
-			fmt.Println("Creating task:", task)
-	
-			_, err := db.ExecContext(ctx, "INSERT INTO tasks (title, status) VALUES ($1, $2)", task.Title, task.Status)
+		} else {
+			// Creating a new task
+			fmt.Println("Creating task:", *task.ID)
+			query := `INSERT INTO tasks (title, description, status) VALUES ($1, $2, $3)`
+			_, err := db.ExecContext(ctx, query, task.Title, task.Description, task.Status)
 			if err != nil {
 				if errors.Is(err, context.DeadlineExceeded) {
 					fmt.Println("task creation timeout:", err)
@@ -106,16 +136,49 @@ func main() {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-	
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(task)
 		}
-	})
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(task)
+
+	}).Methods("POST")
+
+	r.HandleFunc("/api/tasks/{id}", func(w http.ResponseWriter, r *http.Request){
+		enableCors(&w)
+
+		vars := mux.Vars(r)
+		id := vars["id"]
+
+		fmt.Println("Deleting task:", id)
+		_ ,err := strconv.Atoi(id)
+		if err != nil {
+			log.Printf("Failed to delete task: %v\n", err)
+			http.Error(w, "Failed to delete task", http.StatusInternalServerError)
+			return
+		}
+		
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		result, err := db.ExecContext(ctx, "DELETE FROM tasks WHERE id = $1", id)
+		if err != nil {
+			log.Printf("Failed to delete task: %v\n", err)
+			http.Error(w, "Failed to delete task", http.StatusInternalServerError)
+			return
+		}
+		
+		rowsAffected, _ := result.RowsAffected() // Check if rows were affected ?
+		if rowsAffected == 0 {
+			http.Error(w, "Task not found", http.StatusNotFound)
+			return
+		}
 	
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Task deleted successfully"}`))
+	}).Methods("DELETE")
 
     // Start
     log.Println("Starting server on :9080")
-    if err := http.ListenAndServe(":9080", mux); err != nil {
+    if err := http.ListenAndServe(":9080", r); err != nil {
         log.Fatalf("Server failed: %v", err)
     }
 }

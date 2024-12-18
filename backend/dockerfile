@@ -8,3 +8,20 @@ COPY . .
 RUN go build -o main .
 
 CMD ["./main"]
+
+
+
+
+# WORKDIR /app
+
+# COPY go.mod go.sum ./
+# RUN go mod download
+
+# COPY . .
+
+# # Live reload stuff
+# RUN go get github.com/codegangsta/gin
+# ENV GIN_MODE=development
+
+# RUN go build -o kanban-backend .
+# CMD ["gin", "run", "--port=9080"]
