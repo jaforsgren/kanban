@@ -15,12 +15,12 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./db/migrations:/migrations
       - ./db/migrations:/docker-entrypoint-initdb.d
-  backend:
+  go_backend:
     build:
-      context: ./backend
-    container_name: kanban_backend
+      context: ./go_backend
+    container_name: kanban_go_backend
     ports:
-      - "9080:9080"
+      - "9082:9080"
     depends_on:
       - db
     environment:
@@ -33,8 +33,17 @@ services:
       - ./frontend:/usr/share/nginx/html
     ports:
       - "9081:80"
+  python_backend:
+    build:
+      context: ./python_backend
+    container_name: kanban_python_backend
+    volumes:
+      - ./python_backend:/app
+    environment:
+      - FLASK_ENV=development
     depends_on:
-      - backend
-
+      - db
+    ports:
+      - "9080:9082"
 volumes:
   db_data:

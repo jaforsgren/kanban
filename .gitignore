@@ -1,2 +1,5 @@
 NOTES.md
 backend/main
+
+**/__pycache__
+go_backend/main
