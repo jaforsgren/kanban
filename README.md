@@ -1,6 +1,6 @@
 # 🛠️ Multi-Backend Kanban App with Reverse Proxy 🚀
 
-Experience the differences in how **Golang** and **Python** handle servers by building a Kanban application with a random reverse proxy routing to multiple backends. The frontend is kept simple with **HTML + jQuery** for dynamic interactivity.
+Sandbox project exploring the differences in how **Golang** and **Python** handles basic **PostgreSQL** ops by building a Kanban application with a random reverse proxy routing to multiple backends. The frontend is kept simple with **HTML + jQuery** for dynamic interactivity.
 
 ---
 
@@ -15,8 +15,9 @@ Experience the differences in how **Golang** and **Python** handle servers by bu
    ```
 
 2. Start Services (Docker Compose FTW 🚢):
-
-docker-compose up --build
+   ```bash
+   docker-compose up --build
+   ```
 
 3. Access the App:
    Open your browser and go to http://localhost:8080.
@@ -60,7 +61,7 @@ docker-compose up --build
 
 ## 🎯 Next Steps
 
-1. actuall users
+1. actual users
 2. Add **metrics tracking** with a distributed counter service (e.g., Redis).
 3. a php backend
 4. A FE that is actually pleasant (stretch goal)
@@ -69,7 +70,3 @@ docker-compose up --build
 7. Explore language-specific frameworks for optimizations:
    - **Golang**: Add gRPC support.
    - **Python**: Test with FastAPI for async performance.
-
-```
-
-```
